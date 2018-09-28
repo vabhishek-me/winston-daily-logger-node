@@ -1,15 +1,10 @@
 {
-  "name": "winston-node-logger",
+  "name": "winston-daily-logger-node",
   "version": "1.0.0",
   "description": "Winston Logger For Daily Logging and Upload To S3",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vabhishek-me/winston-node-logger.git"
+    "start": "node app.js"
   },
   "keywords": [
     "winston",
@@ -17,10 +12,6 @@
   ],
   "author": "vabhishek-me",
   "license": "UNLICENSED",
-  "bugs": {
-    "url": "https://github.com/vabhishek-me/winston-node-logger/issues"
-  },
-  "homepage": "https://github.com/vabhishek-me/winston-node-logger#readme",
   "dependencies": {
     "aws-sdk": "^2.323.0",
     "dotenv": "^6.0.0",
