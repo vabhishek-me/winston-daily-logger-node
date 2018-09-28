@@ -20,9 +20,9 @@ var winstonOptions = {
     filename: 'app-logs-%DATE%.log', // filename app-logs-20-10-2018
     dirname: `${__basedir}/logs`,  // log directory
     datePattern: 'YYYY-MM-DD', // rotate logs daily
-    zippedArchive: false, // will zip in the on('rotate') function
-    maxSize: '10m', // max log size
-    maxFiles: null, // will delete the files on('rotate')
+    zippedArchive: false, // don't zip for now
+    maxSize: '10m', // max log size = 10mb
+    maxFiles: '7d', // delete files after 7 days
     handleExceptions: true,
   },
   console: {
