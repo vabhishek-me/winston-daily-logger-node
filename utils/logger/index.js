@@ -1,8 +1,16 @@
 const winston = require('winston');
 const DailyRotateFile = require('winston-daily-rotate-file');
-var stringify = require('json-stringify-safe');
+const stringify = require('json-stringify-safe');
+const aws = require('../aws/index');
+const config = require('../../config/index');
+const path = require('path');
+const fs = require('fs');
 
 const customFormat = winston.format.printf(log => {
+  if(typeof(log.message) === typeof({})) {
+    log.message = stringify(log.message, null, 2);
+  };
+
   return `${log.timestamp} [${log.level}]: ${log.message} ${log.meta ? '=> ' + stringify(log.meta, null, 2) : ''}`;
 });
 
@@ -12,9 +20,9 @@ var winstonOptions = {
     filename: 'app-logs-%DATE%.log', // filename app-logs-20-10-2018
     dirname: `${__basedir}/logs`,  // log directory
     datePattern: 'YYYY-MM-DD', // rotate logs daily
-    zippedArchive: true, // gzip the logs afterwards
+    zippedArchive: false, // will zip in the on('rotate') function
     maxSize: '10m', // max log size
-    maxFiles: '7d', // delete files from disk every week
+    maxFiles: null, // will delete the files on('rotate')
     handleExceptions: true,
   },
   console: {
@@ -25,8 +33,23 @@ var winstonOptions = {
 const fileTransport = new DailyRotateFile(winstonOptions.file);
 
 fileTransport.on('rotate', (oldFilename, newFilename) => {
-  // upload file to s3 bucket here and delete it from the drive (or set max days in options)
-  console.log(`Rotating Log File ${oldFilename} to ${newFilename}`);
+  // upload file to s3 bucket
+  const fileParams = {
+    Bucket: config.logger.BUCKET_NAME,
+    Key: `winston-node-app/${path.basename(oldFilename)}`,
+    Body: fs.createReadStream(oldFilename)
+  };
+
+  aws.s3.upload(fileParams, (res) => {
+    if(res) {
+      logger.info(`LOGGER: Old Log file uploaded to s3 successfully (${path.basename(oldFilename)})`);
+      logger.info(`LOGGER: New Log file (${path.basename(newFilename)}) in action`)
+    } else {
+      logger.error(`LOGGER: Log File not uploaded (${path.basename(oldFilename)})`);
+      // copy the file as backup to upload later manually
+      fs.createReadStream(oldFilename).pipe(fs.createWriteStream(`${oldFilename}.backup`));
+    }
+  });
 });
 
 const winstonLogger = winston.createLogger({
