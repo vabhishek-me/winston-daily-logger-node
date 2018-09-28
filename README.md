@@ -11,7 +11,7 @@ This is a customization of winston logger which does the following:
 ## How to use?
 
 - Install all the required packages listed in `package.json`.
-```
+```bash
 npm install --save winston;
 npm install --save winston-daily-rotate-file;
 npm install --save json-stringify-safe;
@@ -24,13 +24,13 @@ npm install --save aws-sdk;
 - Create a `.env` file with all the values as listed in `.env.example`.
 
 - In your `app.js`/`index.js`/`main.js` file, add these lines to configure root folder and load `.env` file
-```
+```js
 global.__basedir = __dirname; // set root directory
 require('dotenv').config(); // load .env file
 ```
 
 - Now, just require the `logger` anywhere you want to use it.
-```
+```js
 const logger = require('./config/logger/index');
 
 logger.error("error");
